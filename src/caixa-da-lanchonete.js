@@ -1,13 +1,10 @@
 class CaixaDaLanchonete {
   calcularValorDaCompra(metodoDePagamento, itens) {
-    const newArray = itens.map((item) => item.split(","));
     const isAcceptedPaymentMethodsValid =
       this.validatePaymentMethod(metodoDePagamento);
     const isCartEmpty = this.validateEmptyCart(itens);
     const isProductsAndQuantitiesValid =
       this.validateAcceptedProductsAndQuantities(itens);
-    let productsArray = [];
-    let quantitiesArray = [];
 
     if (isAcceptedPaymentMethodsValid !== true) {
       return isAcceptedPaymentMethodsValid;
@@ -21,48 +18,19 @@ class CaixaDaLanchonete {
       return isProductsAndQuantitiesValid;
     }
 
-    newArray.forEach((item) => {
-      let [product, quantity] = item;
-      productsArray.push(product);
-      quantity = Number(quantity);
+    const splitedArray = itens.map((item) => item.split(","));
 
-      switch (product) {
-        case "cafe":
-          quantity = 3.0 * quantity;
-          break;
-        case "chantily":
-          quantity = 1.5 * quantity;
-          break;
-        case "suco":
-          quantity = 6.2 * quantity;
-          break;
-        case "sanduiche":
-          quantity = 6.5 * quantity;
-          break;
-        case "queijo":
-          quantity = 2.0 * quantity;
-          break;
-        case "salgado":
-          quantity = 7.25 * quantity;
-          break;
-        case "combo1":
-          quantity = 9.5 * quantity;
-          break;
-        case "combo2":
-          quantity = 7.5 * quantity;
-          break;
-      }
+    const orderValues = this.getValueOfEachItem(splitedArray);
 
-      quantitiesArray.push(quantity);
-    });
+    const grossValue = this.calculateGrossValue(orderValues);
 
-    const grossValue = this.calculateGrossValue(quantitiesArray);
     const liquidValue = this.calculateLiquidValue(
       metodoDePagamento,
       grossValue
     );
-    const formatedValue = this.formatedValue(liquidValue);
-    return formatedValue;
+
+    const formatedBillValue = this.formatedValue(liquidValue);
+    return formatedBillValue;
   }
 
   validatePaymentMethod(metodoDePagamento) {
@@ -110,7 +78,7 @@ class CaixaDaLanchonete {
     newArray.forEach((item) => {
       let [product, quantity] = item;
       productsArray.push(product);
-      quantitiesArray.push(quantity);
+      quantitiesArray.push(Number(quantity));
     });
 
     for (let i = 0; i < productsArray.length; i++) {
@@ -130,8 +98,47 @@ class CaixaDaLanchonete {
     ) {
       return messageErrorExtraWithoutPrincipal;
     }
-
     return true;
+  }
+
+  getValueOfEachItem(splitedArray) {
+    let billAmounts = [];
+
+    splitedArray.forEach((item) => {
+      let [product, quantity] = item;
+      quantity = Number(quantity);
+
+      switch (product) {
+        case "cafe":
+          quantity = 3.0 * quantity;
+          break;
+        case "chantily":
+          quantity = 1.5 * quantity;
+          break;
+        case "suco":
+          quantity = 6.2 * quantity;
+          break;
+        case "sanduiche":
+          quantity = 6.5 * quantity;
+          break;
+        case "queijo":
+          quantity = 2.0 * quantity;
+          break;
+        case "salgado":
+          quantity = 7.25 * quantity;
+          break;
+        case "combo1":
+          quantity = 9.5 * quantity;
+          break;
+        case "combo2":
+          quantity = 7.5 * quantity;
+          break;
+      }
+
+      billAmounts.push(quantity);
+    });
+
+    return billAmounts;
   }
 
   calculateGrossValue(productsArray) {
